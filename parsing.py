@@ -80,12 +80,12 @@ class Parsing():
         hub.update({'name': name, 'x': int(x), 'y': int(y)})
         if len(data.split(' ')) > 3:
             zone, color, max = Parsing.hub_metadata(data, zone, color, max)
-        hub.update({'zone': zone, 'color': color, 'max_drones': max})
+        hub.update({'zone': zone, 'color': color, 'max_drones': max, 'category': 'hub'})
         return hub
 
 
     @staticmethod
-    def hub(data: list[str]):
+    def hub(data: list[str], nb_drones: int) -> list[dict[str, Any]]:
         start = dict()
         end = dict()
         hub = list()
@@ -96,18 +96,22 @@ class Parsing():
                     raise ValueError('multiple start hub is not accepted')
                 _, tmp = data[i].split(':')
                 start = Parsing.new_hub(tmp.lstrip())
+                start.update({'category': 'start', 'max_drones': nb_drones})
+                hub.append(start)
             elif data[i].startswith('end_hub'): 
                 if end:
                     raise ValueError('multiple end hub is not accepted')
                 _, tmp = data[i].split(':')
                 end = Parsing.new_hub(tmp.lstrip())
+                end.update({'category': 'end', 'max_drones': nb_drones})
+                hub.append(end)
             elif data[i].startswith('hub'):
                 _, tmp = data[i].split(':')
                 hub.append(Parsing.new_hub(tmp.lstrip()))
             else:
                 raise NameError('unknown hub keyname')
             i += 1
-        return start, end, hub
+        return hub
 
 
     @staticmethod
@@ -191,6 +195,18 @@ class Parsing():
             conex.append(Parsing.new_connection(tmp.lstrip(), name))
             i += 1
         return conex
+
+
+    @staticmethod
+    def parsing(file: str) -> tuple[int, list, list]:
+        data = Parsing.read(file)
+        nb_drones = Parsing.count(data[0])
+        hub = Parsing.hub(data, nb_drones)
+        name = [h['name'] for h in hub]
+        Parsing.checkname(name)
+        connection = Parsing.connection(data, name)
+        Parsing.checkconnection(connection)
+        return nb_drones, hub, connection
 
 
 if __name__ == "__main__":

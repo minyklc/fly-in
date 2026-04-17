@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
-from parsing import Parsing
+# from Connection import Connection
+# from Visualizer import Visualizer
+from Parsing import Parsing
+from Monitor import Monitor
+# from Drone import Drone
+# from Hub import Hub
 
 
-def main():
+def main() -> None:
     try:
-        data = Parsing.read('maps/easy/01_linear_path.txt')
-        nb_drones = Parsing.count(data[0])
-        start, end, hub = Parsing.hub(data)
-        name = [h['name'] for h in hub]
-        name.append(start['name'])
-        name.append(end['name'])
-        Parsing.checkname(name)
-        connection = Parsing.connection(data, name)
-        Parsing.checkconnection(connection)
-        print(data, nb_drones, start, end, hub, connection, sep='\n\n')
+        nb_drones, hub_d, \
+        connection_d = Parsing.parsing('maps/medium/01_dead_end_trap.txt')
+        # print(nb_drones_d, hub_d, connection_d, sep='\n\n')
     except Exception as e:
-        print(e)
+        return print(e)
+    monitor = Monitor()
+    monitor.init(nb_drones, hub_d, connection_d)
+    monitor.simulate()
+    monitor.visualize(save=False)
 
 
 if __name__ == "__main__":
