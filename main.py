@@ -17,7 +17,7 @@ def main() -> None:
     monitor = Monitor()
     monitor.init(nb_drones, hub_d, connection_d)
     monitor.simulate()
-    monitor.visualize(save=False)
+    monitor.visualize(save=True)
 
 
 if __name__ == "__main__":

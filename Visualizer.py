@@ -45,9 +45,7 @@ class Visualizer():
         for c in connec:
             cx = [hub[c.z1].coor[0], hub[c.z2].coor[0]]
             cy = [hub[c.z1].coor[1], hub[c.z2].coor[1]]
-            ax.plot(cx, cy, color='black', linewidth=3)
-            ax.plot(cx, cy, color='white', linewidth=1)
-        ax.plot(hx, hy, color='black')
+            ax.plot(cx, cy, color='black')
         return ax
 
     def add_path(self, path: list[list[tuple]]):
@@ -81,5 +79,5 @@ class Visualizer():
 
     def show(self, save: bool):
         if save:
-            self.ani.save("flyin.mp4", writer="ffmpeg", fps=50)
+            self.ani.save("flyin.gif", writer="pillow", fps=50)
         plt.show()
