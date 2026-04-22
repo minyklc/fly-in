@@ -37,7 +37,6 @@ class Monitor():
         for c in self.connection:
             if c.z1 == hub1.name or c.z2 == hub1.name:
                 if c.z2 == hub2.name or c.z1 == hub2.name:
-                    print(c.z1, c.z2, hub1.name, hub2.name)
                     return c
         return self.connection[0]
 

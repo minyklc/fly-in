@@ -30,7 +30,7 @@ class Parsing():
 
 
     @staticmethod
-    def hub_metadata(data: str, zone: str, color: str, max: int) -> tuple[str, str, int]:
+    def hub_metadata(data: str, zone: str, color: str, max: int, total: int, category: str | None) -> tuple[str, str, int]:
         boool = [False, False, False]
         if '[' not in data:
             raise NameError('oups missing a bracket in hub definition!')
@@ -49,6 +49,8 @@ class Parsing():
                 zone.lstrip()
                 if zone not in ['normal', 'blocked', 'restricted', 'priority']:
                     raise ValueError('metadata zone should be either normal, blocked, restricted or priority')
+                if zone == 'blocked' and category is not None:
+                    raise ValueError('start or end cannot be blocked zone')
                 boool[0] = True
             elif md.startswith('color'):
                 if boool[1]:
@@ -62,6 +64,8 @@ class Parsing():
                 max = int(md.split('=')[1])
                 if max < 0:
                     raise ValueError('max_drones must be a positive integer')
+                if max < total and category is not None:
+                    raise ValueError('start or end must handle at least the total number of drones')
                 boool[2] = True
             else:
                 raise NameError('unknown hub metadata key')
@@ -69,7 +73,7 @@ class Parsing():
 
 
     @staticmethod
-    def new_hub(data: str) -> dict:
+    def new_hub(data: str, total: int, category: str | None = None) -> dict:
         hub = dict()
         zone = 'normal'
         color = 'none'
@@ -79,7 +83,7 @@ class Parsing():
             raise NameError("hub name shouldn't contain dashes")
         hub.update({'name': name, 'x': int(x), 'y': int(y)})
         if len(data.split(' ')) > 3:
-            zone, color, max = Parsing.hub_metadata(data, zone, color, max)
+            zone, color, max = Parsing.hub_metadata(data, zone, color, max, total, category)
         hub.update({'zone': zone, 'color': color, 'max_drones': max, 'category': 'hub'})
         return hub
 
@@ -95,19 +99,19 @@ class Parsing():
                 if start:
                     raise ValueError('multiple start hub is not accepted')
                 _, tmp = data[i].split(':')
-                start = Parsing.new_hub(tmp.lstrip())
+                start = Parsing.new_hub(tmp.lstrip(), nb_drones, category='start')
                 start.update({'category': 'start', 'max_drones': nb_drones})
                 hub.append(start)
             elif data[i].startswith('end_hub'): 
                 if end:
                     raise ValueError('multiple end hub is not accepted')
                 _, tmp = data[i].split(':')
-                end = Parsing.new_hub(tmp.lstrip())
+                end = Parsing.new_hub(tmp.lstrip(), nb_drones, category='end')
                 end.update({'category': 'end', 'max_drones': nb_drones})
                 hub.append(end)
             elif data[i].startswith('hub'):
                 _, tmp = data[i].split(':')
-                hub.append(Parsing.new_hub(tmp.lstrip()))
+                hub.append(Parsing.new_hub(tmp.lstrip(), nb_drones))
             else:
                 raise NameError('unknown hub keyname')
             i += 1

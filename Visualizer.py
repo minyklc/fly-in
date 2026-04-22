@@ -25,7 +25,7 @@ class Visualizer():
                         )
 
     def update(self, frame: int):
-        turn = frame // 100
+        turn = frame // 50
         if turn != self.turn:
             self.turn = turn
             self.update_turn()
@@ -43,7 +43,7 @@ class Visualizer():
         return new
 
     @staticmethod
-    def smooth_path(hubs, step=50):
+    def smooth_path(hubs, step=25):
         res = list()
         for i in range(len(hubs) - 1):
             for t in np.linspace(0, 1, step, endpoint=False):
@@ -53,7 +53,9 @@ class Visualizer():
     def map(self, hub: dict, connec: list[Connection], ax: Any):
         hx = [hub[h].coor[0] for h in hub]
         hy = [hub[h].coor[1] for h in hub]
-        ax.set_xlim(min(hx) - 2, max(hx) + 2)
+        self.min = min(hx)
+        self.max = max(hx)
+        ax.set_xlim(self.min - 2, self.max + 2)
         ax.set_ylim(min(hy) - 2, max(hy) + 2)
         for h in hub:
             x = hub[h].coor[0]
@@ -95,8 +97,12 @@ class Visualizer():
         self.legend_turn = [turn]
         ax.legend(handles=self.legend_turn, loc='upper left', framealpha=0)
         self.create_drone(nb_drones, ax)
+        
+        speed = 5 - (((self.max - self.min) / 3) * 1.5)
+        print(speed)
+        # speed = 1
 
-        ani = FuncAnimation(fig, self.update, frames=len(self.smooth[0]), interval=0.1)
+        ani = FuncAnimation(fig, self.update, frames=len(self.smooth[0]), interval=speed)
         self.ani = ani
 
     def show(self, save: bool):

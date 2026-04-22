@@ -11,7 +11,7 @@ def main() -> None:
     try:
         nb_drones, hub_d, \
         connection_d = Parsing.parsing('maps/challenger/01_the_impossible_dream.txt')
-        # connection_d = Parsing.parsing('maps/medium/03_priority_puzzle.txt')
+        # connection_d = Parsing.parsing('maps/easy/01_linear_path.txt')
     except Exception as e:
         return print(e)
     monitor = Monitor()
