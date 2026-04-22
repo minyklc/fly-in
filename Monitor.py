@@ -29,13 +29,24 @@ class Monitor():
             for w in self.connection:
                 if w.z1 == h['name'] or h['name'] == w.z2:
                     self.hub[h['name']].connections.append(w)
+        for connec in self.connection:
+            connec.position(self.hub[connec.z1].coor, self.hub[connec.z2].coor)
+            
+    
+    def find_connection(self, hub1: Hub, hub2: Hub) -> Connection:
+        for c in self.connection:
+            if c.z1 == hub1.name or c.z2 == hub1.name:
+                if c.z2 == hub2.name or c.z1 == hub2.name:
+                    print(c.z1, c.z2, hub1.name, hub2.name)
+                    return c
+        return self.connection[0]
 
 
     def search_path(self):
         unknown = [self.hub[h] for h in self.hub
             if self.hub[h].zone != 'blocked']
         self.start.distance = 0
-        
+
         while unknown:
             actual = min(unknown, key=lambda x: x.distance)
             unknown.remove(actual)
@@ -46,22 +57,25 @@ class Monitor():
                     if neighbour.distance != 1000 and total < neighbour.distance:
                         neighbour.distance = total
                         neighbour.prev = actual
-        
+
         now = self.end
         path = [now]
         while now != self.start:
+            if path[-1].zone == "restricted":
+                path.append(self.find_connection(now.prev, path[-1]))
             path.append(now.prev)
             now = now.prev
-        # path.append(now)
         path.reverse()
+        # print(path)
         return path
+
 
     def finished(self):
         for d in self.drone:
             if d.active is True:
                 return False
         return True
-                
+
 
     def start_sim(self, path):
         for d in self.drone:

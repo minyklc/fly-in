@@ -10,14 +10,14 @@ from Monitor import Monitor
 def main() -> None:
     try:
         nb_drones, hub_d, \
-        connection_d = Parsing.parsing('maps/medium/01_dead_end_trap.txt')
-        # print(nb_drones_d, hub_d, connection_d, sep='\n\n')
+        connection_d = Parsing.parsing('maps/challenger/01_the_impossible_dream.txt')
+        # connection_d = Parsing.parsing('maps/medium/03_priority_puzzle.txt')
     except Exception as e:
         return print(e)
     monitor = Monitor()
     monitor.init(nb_drones, hub_d, connection_d)
     monitor.simulate()
-    monitor.visualize(save=True)
+    monitor.visualize(save=False)
 
 
 if __name__ == "__main__":

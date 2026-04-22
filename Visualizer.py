@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.animation import FuncAnimation
 
 
@@ -11,8 +12,24 @@ class Visualizer():
     def __init__(self):
         self.smooth = list()
         self.drone = list()
+        self.turn = 0
+        self.legend_turn = None
+
+    def update_turn(self):
+        if self.legend_turn is not None:
+            self.legend_turn[0].set_label(f'Turn: {self.turn}')
+            self.ax.legend(
+                            handles=self.legend_turn,
+                            loc='upper left',
+                            framealpha=0.8
+                        )
 
     def update(self, frame: int):
+        turn = frame // 100
+        if turn != self.turn:
+            self.turn = turn
+            self.update_turn()
+        
         for i in range(len(self.drone)):
             x, y = self.smooth[i][frame]
             self.drone[i].set_data([x], [y])
@@ -41,7 +58,10 @@ class Visualizer():
         for h in hub:
             x = hub[h].coor[0]
             y = hub[h].coor[1]
-            ax.scatter(x, y, c=hub[h].color, s=500, edgecolors='black')
+            try:
+                ax.scatter(x, y, c=hub[h].color, s=500, edgecolors='black')
+            except ValueError:
+                ax.scatter(x, y, c='none', s=500, edgecolors='black')
         for c in connec:
             cx = [hub[c.z1].coor[0], hub[c.z2].coor[0]]
             cy = [hub[c.z1].coor[1], hub[c.z2].coor[1]]
@@ -58,7 +78,7 @@ class Visualizer():
 
     def create_drone(self, nb: int, ax: Any):
         for i in range(nb):
-            drone, = ax.plot([], [], 'yo', markersize=10, label='Drone')
+            drone, = ax.plot([], [], 'yo', markersize=10)
             self.drone.append(drone)
 
     def generate(self, hub: dict, connec: list[Connection], nb_drones: int, paths: list[list]):
@@ -71,10 +91,12 @@ class Visualizer():
         self.add_path(paths)
 
         #créer les drones
+        turn = Line2D([], [], color='none', label=f'Turn : {self.turn}')
+        self.legend_turn = [turn]
+        ax.legend(handles=self.legend_turn, loc='upper left', framealpha=0)
         self.create_drone(nb_drones, ax)
 
-        # ax.legend()
-        ani = FuncAnimation(fig, self.update, frames=len(self.smooth[0]), interval=20)
+        ani = FuncAnimation(fig, self.update, frames=len(self.smooth[0]), interval=0.1)
         self.ani = ani
 
     def show(self, save: bool):

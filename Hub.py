@@ -17,6 +17,7 @@ class Hub():
         self.zone = hub_data['zone']
         self.color = hub_data['color']
         self.max_drones = hub_data['max_drones']
+        self.maxmax = hub_data['max_drones']
         self.connections = list()
         self.distance = 100
         if hub_data['zone'] == 'blocked':
