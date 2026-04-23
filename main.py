@@ -3,22 +3,31 @@
 # from Visualizer import Visualizer
 from Parsing import Parsing
 from Monitor import Monitor
+import sys
 # from Drone import Drone
 # from Hub import Hub
 
 
 def main() -> None:
     try:
-        nb_drones, hub_d, \
-        connection_d = Parsing.parsing('maps/challenger/01_the_impossible_dream.txt')
-        # connection_d = Parsing.parsing('maps/easy/01_linear_path.txt')
+        args = sys.argv
+        if len(args) < 2:
+            raise Exception("must execute with filename")
+        elif len(args) > 2:
+            raise Exception("one argument accepted")
+        file = args[1]
+    except Exception as e:
+        return print(e)
+
+    try:
+        nb_drones, hub_d, connection_d = Parsing.parsing(file)
     except Exception as e:
         return print(e)
     monitor = Monitor()
     monitor.init(nb_drones, hub_d, connection_d)
-    monitor.simulate()
+    monitor.simulate(flag=False)
     monitor.visualize(save=False)
 
 
 if __name__ == "__main__":
-	main()
+    main()

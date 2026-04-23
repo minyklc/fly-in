@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+from typing import Any
+from Connection import Connection
 
 
 class Hub():
-    def __init__(self, hub_data: dict):
+    def __init__(self, hub_data: dict[str, Any]):
         self.category = hub_data['category']
         if hub_data['category'] == 'priority':
             self.cost = 1
@@ -18,18 +20,8 @@ class Hub():
         self.color = hub_data['color']
         self.max_drones = hub_data['max_drones']
         self.maxmax = hub_data['max_drones']
-        self.connections = list()
+        self.connections: list[Connection] = list()
         self.distance = 100
         if hub_data['zone'] == 'blocked':
             self.distance = 1000
         self.prev = None
-
-    # @staticmethod
-    # def create_hubs(data: list[dict], connec: list[Connection]) -> list[Any]:
-    #     hubs = list()
-    #     for d in data:
-    #         hubs.append(Hub(d))
-    #         for c in connec:
-    #             if hubs[-1].name == c.z1 or hubs[-1].name == c.z2:
-    #                 hubs[-1].connections.append(c)
-    #     return hubs
