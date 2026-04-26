@@ -1,0 +1,7 @@
+__pycache__
+.mypy_cache
+maps.tar
+test.py
+.DS_Store
+flyin.mp4
+flyin.gif
